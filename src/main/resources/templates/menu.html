@@ -1,0 +1,10 @@
+<div class="menu"  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <a th:href="@{/}">ГОЛОВНА</a>
+  <a th:href="@{/cart}">КОШИК (<span id="cart_items">0</span>)</a>
+  <a th:href="@{/priceList}" th:if="${#authorization.expression('hasAuthority(''Distributor'')')}">Прайс ліст</a>
+  <a th:href="@{/distributors}" th:if="${#authorization.expression('hasAuthority(''Admin'')')}">Постачальники</a>
+  <a th:href="@{/addGoodToPrice}" th:if="${#authorization.expression('hasAuthority(''Distributor'')')}">Додати товар у прайс</a>
+  <a th:href="@{/login}" th:if="${#authorization.expression('!isAuthenticated()')}">Увійти</a>
+  <a href="#" th:inline="text" th:if="${#authorization.expression('isAuthenticated()')}">[[${#httpServletRequest.remoteUser}]]</a>
+  <a th:href="@{/logout}" th:if="${#authorization.expression('isAuthenticated()')}">Вийти</a>
+</div>
