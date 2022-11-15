@@ -28,7 +28,7 @@
     <p style="font-weight: bold">General info</p>
     <p th:each="category : ${categories}">
       <span th:utext="${category.name}" style="float: left"></span>
-      <span th:if="${category.id} != ${categories.get(categories.size()-1).id}" style="float: left">---</span>
+      <span th:if="${category.idCategory} != ${categories.get(categories.size()-1).idCategory}" style="float: left">---</span>
     </p>
     <br/>
     <p th:utext="'Good name: ' + ${Good.name}"></p>

@@ -2,6 +2,7 @@ package ua.nure.rebrov.wholesale_base.dao.mysql;
 
 import ua.nure.rebrov.wholesale_base.dao.CategoryDAO;
 import ua.nure.rebrov.wholesale_base.dao.mysql.MySQLConnector;
+import ua.nure.rebrov.wholesale_base.model.Good;
 import ua.nure.rebrov.wholesale_base.model.GoodCategory;
 
 import java.sql.Connection;
@@ -30,7 +31,9 @@ public class MySQLCategoryDAO implements CategoryDAO {
             categoryList = new LinkedList<>();
             while(rs.next()){
                 categoryList.add(new GoodCategory(rs.getInt("id"), rs.getString("name"), rs.getInt("parent_id")));
+
             }
+
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

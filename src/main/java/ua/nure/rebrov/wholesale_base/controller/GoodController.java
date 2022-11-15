@@ -32,7 +32,7 @@ public class GoodController {
         daoFactory = new MySQLDAO();
         Good good = daoFactory.createGoodDAO().getById(id);
         if(good!=null){
-            model.addAttribute("categories", daoFactory.createCategoryDAO().getAllParentCategories(Integer.valueOf(good.getId())));
+            model.addAttribute("categories", daoFactory.createCategoryDAO().getAllParentCategories(Integer.valueOf(good.getCategory().getIdCategory())));
             model.addAttribute("Good",good);
             return "good.html";
         }else{
