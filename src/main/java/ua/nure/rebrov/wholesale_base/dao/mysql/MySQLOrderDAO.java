@@ -14,10 +14,6 @@ import java.util.Map.Entry;
 
 public class MySQLOrderDAO extends MySQLschema implements OrderDAO {
 
-    public MySQLOrderDAO(){
-        super();
-    }
-
     @Override
     public void create(Order order) {
         try {

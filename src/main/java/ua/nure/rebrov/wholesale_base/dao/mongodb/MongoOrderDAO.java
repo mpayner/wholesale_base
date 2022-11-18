@@ -5,7 +5,7 @@ import ua.nure.rebrov.wholesale_base.model.Order;
 
 import java.util.List;
 
-public class MongoOrderDAO implements OrderDAO {
+public class MongoOrderDAO extends MongoDBschema implements OrderDAO {
     @Override
     public void create(Order order) {
 

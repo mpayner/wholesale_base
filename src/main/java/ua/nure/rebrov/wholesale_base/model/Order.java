@@ -1,5 +1,8 @@
 package ua.nure.rebrov.wholesale_base.model;
 
+import com.google.gson.Gson;
+import org.bson.Document;
+
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -171,28 +174,12 @@ public class Order {
         this.cart = cart;
     }
 
+    public Document toDocument(){
+        Gson gson = new Gson();
+        return Document.parse(gson.toJson(this));
+    }
+
     public static List<Order> groupOrders(Map<Good,Integer> cart, User customer){
-        /*List<Order> orders = null;
-        Map<User, Map<Good,Integer>> groupedGoods = new HashMap<>();
-        for (Map.Entry entry: cart.entrySet()) {
-            User manufacturer = ((Good)entry.getKey()).getManufacturer();
-            if(!groupedGoods.containsKey(manufacturer)){
-                groupedGoods.put(manufacturer, new HashMap<>());
-                groupedGoods.get(manufacturer).put((Good) entry.getKey(), (Integer) entry.getValue());
-            }else{
-                groupedGoods.get(manufacturer).put((Good) entry.getKey(), (Integer) entry.getValue());
-            }
-        }
-
-        orders = new ArrayList<>(groupedGoods.size());
-        for(Map.Entry entry: groupedGoods.entrySet()){
-            Map<Good, Integer> goods = ((Map<Good, Integer>) entry.getValue());
-            User distributor = ((User) entry.getKey());
-            Order order = new Order.Builder(customer, distributor, goods).build();
-            orders.add(order);
-        }*/
-
-
         Stream<Good> goodStream = cart.keySet().stream();
         Map<String, List<Good>> groupedGoods = goodStream.collect(Collectors.groupingBy(g ->g.getManufacturer().getId()));
         System.out.println(groupedGoods);

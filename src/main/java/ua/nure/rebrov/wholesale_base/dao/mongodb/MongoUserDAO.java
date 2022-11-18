@@ -5,7 +5,7 @@ import ua.nure.rebrov.wholesale_base.model.User;
 
 import java.util.List;
 
-public class MongoUserDAO implements UserDAO {
+public class MongoUserDAO extends MongoDBschema implements UserDAO {
     @Override
     public List<User> getAll() {
         return null;

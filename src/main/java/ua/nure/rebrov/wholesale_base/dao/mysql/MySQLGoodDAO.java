@@ -12,9 +12,7 @@ import java.util.List;
 
 public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
 
-    public MySQLGoodDAO(){
-        super();
-    }
+
     @Override
     public List<Good> getAll() {
         List <Good> list = new LinkedList<>();
@@ -83,7 +81,13 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
             ps.setInt(1, Integer.valueOf(good.getId()));
             ResultSet rs = ps.executeQuery();
             rs.next();
-            return rs.getInt(1);
+            Integer q = rs.getInt(1);
+            if(rs.wasNull()){
+                return null;
+            }else {
+                return q;
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -102,7 +106,6 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
     @Override
     public boolean decreaseQuantity(Good good, Integer quantity) {
         Integer check = getQuantity(good);
-        System.out.println("Ch:" + check);
         if(check==null){
             return true;
         }

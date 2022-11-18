@@ -14,10 +14,6 @@ import java.util.List;
 
 public class MySQLCategoryDAO extends MySQLschema implements CategoryDAO {
 
-    public MySQLCategoryDAO(){
-        super();
-    }
-
     @Override
     public List<GoodCategory> getAllParentCategories(Integer id) {
         List<GoodCategory> categoryList = null;

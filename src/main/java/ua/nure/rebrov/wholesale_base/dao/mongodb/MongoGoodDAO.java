@@ -18,12 +18,7 @@ import java.util.List;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-public class MongoGoodDAO implements GoodDAO {
-
-    private static MongoDatabase con = null;
-    public MongoGoodDAO()  {
-        con = MongoDBConnector.getDefaultConnection();
-    }
+public class MongoGoodDAO extends MongoDBschema implements GoodDAO {
 
     public List<Good> getAll(){
         List<Good> l  = new LinkedList<>();

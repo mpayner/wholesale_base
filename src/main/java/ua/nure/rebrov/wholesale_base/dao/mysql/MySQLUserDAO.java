@@ -18,9 +18,6 @@ import static ua.nure.rebrov.wholesale_base.model.UserType.*;
 
 public class MySQLUserDAO extends MySQLschema implements UserDAO {
 
-    public MySQLUserDAO(){
-        super();
-    }
     @Override
     public List<User> getAll() {
         List<User> list = new LinkedList<>();
