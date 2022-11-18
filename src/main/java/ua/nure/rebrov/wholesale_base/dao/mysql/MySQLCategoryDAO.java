@@ -12,15 +12,12 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MySQLCategoryDAO implements CategoryDAO {
-    private Connection con;
+public class MySQLCategoryDAO extends MySQLschema implements CategoryDAO {
+
     public MySQLCategoryDAO(){
-        try {
-            con = MySQLConnector.getDefaultConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        super();
     }
+
     @Override
     public List<GoodCategory> getAllParentCategories(Integer id) {
         List<GoodCategory> categoryList = null;

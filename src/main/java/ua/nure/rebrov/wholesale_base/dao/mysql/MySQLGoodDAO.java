@@ -10,15 +10,10 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MySQLGoodDAO implements GoodDAO {
+public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
 
-    private Connection con;
     public MySQLGoodDAO(){
-        try {
-            con = MySQLConnector.getDefaultConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        super();
     }
     @Override
     public List<Good> getAll() {

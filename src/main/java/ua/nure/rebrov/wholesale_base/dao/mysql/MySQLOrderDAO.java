@@ -12,15 +12,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-public class MySQLOrderDAO implements OrderDAO {
+public class MySQLOrderDAO extends MySQLschema implements OrderDAO {
 
-    private Connection con;
     public MySQLOrderDAO(){
-        try {
-            con = MySQLConnector.getDefaultConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        super();
     }
 
     @Override

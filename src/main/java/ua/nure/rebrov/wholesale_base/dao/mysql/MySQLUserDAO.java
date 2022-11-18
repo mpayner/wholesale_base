@@ -16,16 +16,10 @@ import java.util.List;
 
 import static ua.nure.rebrov.wholesale_base.model.UserType.*;
 
-public class MySQLUserDAO implements UserDAO {
-
-    private Connection con;
+public class MySQLUserDAO extends MySQLschema implements UserDAO {
 
     public MySQLUserDAO(){
-        try {
-            con = MySQLConnector.getDefaultConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        super();
     }
     @Override
     public List<User> getAll() {
