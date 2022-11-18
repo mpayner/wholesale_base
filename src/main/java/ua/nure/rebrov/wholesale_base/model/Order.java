@@ -2,21 +2,25 @@ package ua.nure.rebrov.wholesale_base.model;
 
 import com.google.gson.Gson;
 import org.bson.Document;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 public class Order {
+    @BsonIgnore
     private Integer id;
     private User customer;
     private User distributor;
+    @BsonIgnore
     private String waybill;
     private Timestamp createDate;
-    String status;
-    String address;
+    private String status;
+    private String address;
     private Timestamp deliveryDate;
+    @BsonIgnore
     private Map<Good, Integer> cart;
 
     private Order(Builder builder) {
@@ -33,8 +37,8 @@ public class Order {
 
     public static class Builder{
         private Integer id;
-        private final User customer;
-        private final User distributor;
+        private User customer;
+        private User distributor;
         private String waybill;
         private Timestamp createDate;
         private String status;
@@ -89,6 +93,7 @@ public class Order {
     }
 
     public Order() {}
+
 
     public Order(Integer id, User customer, User distributor, String waybill, Timestamp createDate, String status, String address, Timestamp deliveryDate, Map<Good, Integer> cart) {
         this.id = id;

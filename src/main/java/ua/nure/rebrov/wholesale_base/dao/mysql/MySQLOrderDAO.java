@@ -2,6 +2,8 @@ package ua.nure.rebrov.wholesale_base.dao.mysql;
 
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
+import ua.nure.rebrov.wholesale_base.dao.DAOFactory;
+import ua.nure.rebrov.wholesale_base.dao.MongoDBDAO;
 import ua.nure.rebrov.wholesale_base.dao.OrderDAO;
 import ua.nure.rebrov.wholesale_base.dao.mysql.MySQLConnector;
 import ua.nure.rebrov.wholesale_base.model.Good;
@@ -41,6 +43,10 @@ public class MySQLOrderDAO extends MySQLschema implements OrderDAO {
                     ps.executeUpdate();
                 }
                 con.commit();
+                //
+                DAOFactory dao = new MongoDBDAO();
+                dao.createOrderDAO().create(order);
+                //
             } catch (SQLException e) {
                 e.printStackTrace();
                 con.rollback(savepoint);

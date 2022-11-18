@@ -1,6 +1,7 @@
 package ua.nure.rebrov.wholesale_base.model;
 
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +11,7 @@ public class User implements Comparable{
     private String name;
     private String phone;
     private String email;
+    @BsonIgnore
     private String password;
     private String address;
     private Base base;
