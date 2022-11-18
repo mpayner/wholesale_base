@@ -91,13 +91,22 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
 
     @Override
     public boolean increaseQuantity(Good good, Integer quantity) {
-        System.out.println("FFF:"+getQuantity(good)+quantity);
-        return updateQuantity(good, getQuantity(good)+quantity);
+        Integer check = getQuantity(good);
+        if(check==null){
+            return true;
+        }else {
+            return updateQuantity(good, check + quantity);
+        }
     }
 
     @Override
     public boolean decreaseQuantity(Good good, Integer quantity) {
-        int q = getQuantity(good)-quantity;
+        Integer check = getQuantity(good);
+        System.out.println("Ch:" + check);
+        if(check==null){
+            return true;
+        }
+        int q = check -quantity;
 
         try {
             if(q<0){
