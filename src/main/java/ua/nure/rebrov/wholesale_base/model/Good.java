@@ -1,14 +1,18 @@
 package ua.nure.rebrov.wholesale_base.model;
 
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+
 public class Good implements Comparable{
     private String id;
+    @BsonIgnore
     private User user;
     private User manufacturer;
 
     private String name;
     private String description;
     private Double price;
+    @BsonIgnore
     private Integer quantity;
     private GoodCategory category;
     private String unitType;
@@ -16,6 +20,7 @@ public class Good implements Comparable{
     public Good(){
         this.category = new GoodCategory();
     }
+
     public Good(String id, User user, User manufacturer, String name, String description, Double price, Integer quantity, GoodCategory category, String unitType) {
         this.id = id;
         this.user = user;

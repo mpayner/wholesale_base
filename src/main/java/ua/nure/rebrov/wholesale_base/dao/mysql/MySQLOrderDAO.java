@@ -8,6 +8,7 @@ import ua.nure.rebrov.wholesale_base.dao.OrderDAO;
 import ua.nure.rebrov.wholesale_base.dao.mysql.MySQLConnector;
 import ua.nure.rebrov.wholesale_base.model.Good;
 import ua.nure.rebrov.wholesale_base.model.Order;
+import ua.nure.rebrov.wholesale_base.model.User;
 
 import java.sql.*;
 import java.util.List;
@@ -62,5 +63,25 @@ public class MySQLOrderDAO extends MySQLschema implements OrderDAO {
         for(Order order : orderList){
             create(order);
         }
+    }
+
+    @Override
+    public List<Order> findByDistributor(User distributor) {
+        return null;
+    }
+
+    @Override
+    public List<Order> findByCustomer(User customer) {
+        return null;
+    }
+
+    @Override
+    public boolean updateStatus(Order order, String status) {
+        return false;
+    }
+
+    @Override
+    public boolean delete(Order order) {
+        return false;
     }
 }

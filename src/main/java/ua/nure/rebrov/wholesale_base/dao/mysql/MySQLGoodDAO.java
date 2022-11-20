@@ -34,7 +34,7 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
                         rs.getString("category_name"),
                         rs.getInt("parent_id")
                 ));
-                String unit = rs.getInt("unit_type_id") == 1 ? UnitType.Ящик.toString() : UnitType.Вроздріб.toString();
+                String unit = rs.getInt("unit_type_id") == 1 ? UnitType.Box.toString() : UnitType.Pack.toString();
                 good.setUnitType(unit);
                 list.add(good);
             }
@@ -174,10 +174,10 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
                 ps.setNull(5, Types.INTEGER);
             }
             ps.setInt(6, good.getCategory().getIdCategory());
-            if(UnitType.Ящик.toString().equals(good.getUnitType())){
-                ps.setInt(7, UnitType.Ящик.ordinal()+1);
+            if(UnitType.Box.toString().equals(good.getUnitType())){
+                ps.setInt(7, UnitType.Box.ordinal()+1);
             }else {
-                ps.setInt(7, UnitType.Вроздріб.ordinal()+1);
+                ps.setInt(7, UnitType.Pack.ordinal()+1);
             }
             ps.setInt(8, Integer.valueOf(good.getManufacturer().getId()));
             ps.executeUpdate();
@@ -205,10 +205,10 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
                 ps.setNull(4, Types.INTEGER);
             }
             ps.setInt(5, good.getCategory().getIdCategory());
-            if(UnitType.Ящик.toString().equals(good.getUnitType())){
-                ps.setInt(6, UnitType.Ящик.ordinal()+1);
+            if(UnitType.Box.toString().equals(good.getUnitType())){
+                ps.setInt(6, UnitType.Box.ordinal()+1);
             }else {
-                ps.setInt(6, UnitType.Вроздріб.ordinal()+1);
+                ps.setInt(6, UnitType.Pack.ordinal()+1);
             }
             ps.setInt(7, Integer.valueOf(good.getId()));
             System.out.println(good.getId());

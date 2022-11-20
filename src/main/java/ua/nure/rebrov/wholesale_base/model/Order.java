@@ -1,9 +1,12 @@
 package ua.nure.rebrov.wholesale_base.model;
 
 import com.google.gson.Gson;
-import org.bson.Document;
+import org.bson.*;
+import org.bson.codecs.pojo.annotations.BsonExtraElements;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.codecs.pojo.annotations.BsonRepresentation;
+import org.bson.types.ObjectId;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -11,14 +14,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 public class Order {
     @BsonIgnore
-    private Integer id;
+    private String id;
     private User customer;
     private User distributor;
     @BsonIgnore
     private String waybill;
+    @BsonRepresentation(BsonType.TIMESTAMP)
     private Timestamp createDate;
     private String status;
     private String address;
+    @BsonRepresentation(BsonType.TIMESTAMP)
     private Timestamp deliveryDate;
     @BsonIgnore
     private Map<Good, Integer> cart;
@@ -35,8 +40,9 @@ public class Order {
         this.cart = builder.cart;
     }
 
+
     public static class Builder{
-        private Integer id;
+        private String id;
         private User customer;
         private User distributor;
         private String waybill;
@@ -52,7 +58,7 @@ public class Order {
             this.cart = cart;
         }
 
-        public Builder setId(Integer id){
+        public Builder setId(String id){
             this.id=id;
             return this;
         }
@@ -95,7 +101,7 @@ public class Order {
     public Order() {}
 
 
-    public Order(Integer id, User customer, User distributor, String waybill, Timestamp createDate, String status, String address, Timestamp deliveryDate, Map<Good, Integer> cart) {
+    public Order(String id, User customer, User distributor, String waybill, Timestamp createDate, String status, String address, Timestamp deliveryDate, Map<Good, Integer> cart) {
         this.id = id;
         this.customer = customer;
         this.distributor = distributor;
@@ -107,11 +113,30 @@ public class Order {
         this.cart = cart;
     }
 
-    public Integer getId() {
+    public Order(Document document){
+        this.id = document.get("_id", ObjectId.class).toString();
+        Gson gson = new Gson();
+        this.customer = gson.fromJson(((Document)document.get("customer")).toJson(), User.class);
+        this.distributor = gson.fromJson(((Document)document.get("distributor")).toJson(), User.class);
+        this.waybill = document.get("waybill", String.class);
+        this.createDate = new Timestamp(((Date)document.get("createDate")).getTime());
+        this.status = document.get("status", String.class);
+        this.address = document.get("address", String.class);
+        Object tmp = document.get("deliveryDate");
+        this.deliveryDate = tmp == null ? null : new Timestamp(((Date) tmp).getTime());
+        List<Document> documentCart = document.getList("cart", Document.class);
+        this.cart = new TreeMap<>();
+        for(Document d: documentCart){
+            this.cart.put(gson.fromJson(((Document)d.get("good")).toJson(), Good.class), d.get("quantity", Integer.class));
+        }
+
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -180,8 +205,28 @@ public class Order {
     }
 
     public Document toDocument(){
-        Gson gson = new Gson();
-        return Document.parse(gson.toJson(this));
+        return new Document()
+                .append("customer", customer)
+                .append("distributor",distributor)
+                .append("createDate", createDate)
+                .append("deliveryDate", deliveryDate)
+                .append("address", address)
+                .append("status", status)
+                .append("cart", cartToArrayOfDocuments());
+    }
+
+    public List<Document> cartToArrayOfDocuments(){
+        List<Document> list = null;
+        try {
+            list = new LinkedList<>();
+            for (Map.Entry entry : this.cart.entrySet()) {
+                Object o = entry.getKey();
+                list.add(new Document().append("good", o).append("quantity", entry.getValue()));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public static List<Order> groupOrders(Map<Good,Integer> cart, User customer){

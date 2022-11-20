@@ -14,7 +14,6 @@ import java.util.*;
 @org.springframework.stereotype.Controller
 public class GoodController {
 
-    //private IDAO dao = null;
     private DAOFactory daoFactory;
 
 
@@ -61,7 +60,7 @@ public class GoodController {
         model.addAttribute("Good", good);
         model.addAttribute("GoodCategory", new GoodCategory());
         model.addAttribute("categories",user.getSpecialization());
-        model.addAttribute("units", Arrays.asList(UnitType.Ящик.toString(), UnitType.Вроздріб.toString()));
+        model.addAttribute("units", Arrays.asList(UnitType.Box.toString(), UnitType.Pack.toString()));
         return "goodForm.html";
     }
 
@@ -94,7 +93,7 @@ public class GoodController {
         model.addAttribute("Good", good);
         model.addAttribute("GoodCategory", new GoodCategory());
         model.addAttribute("categories",user.getSpecialization());
-        model.addAttribute("units", Arrays.asList(UnitType.Ящик.toString(), UnitType.Вроздріб.toString()));
+        model.addAttribute("units", Arrays.asList(UnitType.Box.toString(), UnitType.Pack.toString()));
         return "goodForm.html";
     }
 
