@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-public class Order {
+public class Order implements BsonUtils{
     @BsonIgnore
     private String id;
     private User customer;
@@ -21,7 +21,7 @@ public class Order {
     private String waybill;
     @BsonRepresentation(BsonType.TIMESTAMP)
     private Timestamp createDate;
-    private String status;
+    private OrderStatus status;
     private String address;
     @BsonRepresentation(BsonType.TIMESTAMP)
     private Timestamp deliveryDate;
@@ -41,13 +41,15 @@ public class Order {
     }
 
 
+
+
     public static class Builder{
         private String id;
         private User customer;
         private User distributor;
         private String waybill;
         private Timestamp createDate;
-        private String status;
+        private OrderStatus status;
         private String address;
         private Timestamp deliveryDate;
         final private Map<Good, Integer> cart;
@@ -73,7 +75,7 @@ public class Order {
             return this;
         }
 
-        public Builder setStatus(String status){
+        public Builder setStatus(OrderStatus status){
             this.status = status;
             return this;
         }
@@ -101,7 +103,7 @@ public class Order {
     public Order() {}
 
 
-    public Order(String id, User customer, User distributor, String waybill, Timestamp createDate, String status, String address, Timestamp deliveryDate, Map<Good, Integer> cart) {
+    public Order(String id, User customer, User distributor, String waybill, Timestamp createDate, OrderStatus status, String address, Timestamp deliveryDate, Map<Good, Integer> cart) {
         this.id = id;
         this.customer = customer;
         this.distributor = distributor;
@@ -115,21 +117,51 @@ public class Order {
 
     public Order(Document document){
         this.id = document.get("_id", ObjectId.class).toString();
-        Gson gson = new Gson();
-        this.customer = gson.fromJson(((Document)document.get("customer")).toJson(), User.class);
-        this.distributor = gson.fromJson(((Document)document.get("distributor")).toJson(), User.class);
+        Document user = document.get("customer", Document.class);
+        this.customer =  new User(
+                user.getString("id"),
+                user.getString("name"),
+                user.getString("phone"),
+                user.getString("email"),
+                null, null, null, user.getString("type"),
+                null
+        );
+        user = document.get("distributor", Document.class);
+        this.distributor = new User(
+                user.getString("id"),
+                user.getString("name"),
+                user.getString("phone"),
+                user.getString("email"),
+                null, null, null, user.getString("type"),
+                null
+        );
         this.waybill = document.get("waybill", String.class);
         this.createDate = new Timestamp(((Date)document.get("createDate")).getTime());
-        this.status = document.get("status", String.class);
+        this.status = OrderStatus.contains(document.get("status", String.class));
         this.address = document.get("address", String.class);
         Object tmp = document.get("deliveryDate");
         this.deliveryDate = tmp == null ? null : new Timestamp(((Date) tmp).getTime());
         List<Document> documentCart = document.getList("cart", Document.class);
         this.cart = new TreeMap<>();
         for(Document d: documentCart){
-            this.cart.put(gson.fromJson(((Document)d.get("good")).toJson(), Good.class), d.get("quantity", Integer.class));
+            Document good = d.get("good", Document.class);
+            user = good.get("manufacturer", Document.class);
+            Document category = good.get("category", Document.class);
+            this.cart.put(
+                    new Good(
+                            good.getString("id"),
+                            null,
+                            new User(user.getString("id"),user.getString("name"), null, null, null, null, null, null, null),
+                            good.getString("name"),
+                            good.getString("description"),
+                            (double)Math.round(good.getDouble("price")),
+                            null,
+                            new GoodCategory(category.getInteger("id"), category.getString("name"), null),
+                            good.getString("unitType")
+                    ),
+                    d.getInteger("quantity")
+            );
         }
-
     }
 
     public String getId() {
@@ -172,11 +204,11 @@ public class Order {
         this.createDate = createDate;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 
@@ -204,15 +236,23 @@ public class Order {
         this.cart = cart;
     }
 
+    @Override
     public Document toDocument(){
-        return new Document()
+        Document doc = new Document()
                 .append("customer", customer)
                 .append("distributor",distributor)
                 .append("createDate", createDate)
                 .append("deliveryDate", deliveryDate)
-                .append("address", address)
-                .append("status", status)
-                .append("cart", cartToArrayOfDocuments());
+                .append("waybill", waybill);
+        if(customer.getType().equals(UserType.Admin.toString())){
+            doc.append("address", customer.getBase().getAddress());
+        }else if(customer.getType().equals(UserType.Client.toString()) && customer.getAddress()!=null){
+            doc.append("address", customer.getAddress());
+        }else {
+            doc.append("address", address);
+        }
+        doc.append("status", status.getTitle()).append("cart", cartToArrayOfDocuments());
+        return doc;
     }
 
     public List<Document> cartToArrayOfDocuments(){
@@ -220,8 +260,8 @@ public class Order {
         try {
             list = new LinkedList<>();
             for (Map.Entry entry : this.cart.entrySet()) {
-                Object o = entry.getKey();
-                list.add(new Document().append("good", o).append("quantity", entry.getValue()));
+                Good o = (Good)entry.getKey();
+                list.add(new Document().append("good", o.toDocument()).append("quantity", entry.getValue()));
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -249,4 +289,15 @@ public class Order {
         }
         return orders;
     }
+
+    public double generalSum(){
+        double sum = 0.0D;
+        for (Map.Entry entry : this.cart.entrySet()) {
+            Good o = (Good)entry.getKey();
+            sum+= o.getPrice() * (int)entry.getValue();
+        }
+        return sum;
+    }
+
+
 }

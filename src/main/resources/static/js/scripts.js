@@ -60,6 +60,13 @@ function remove_cart_items() {
 }
 remove_cart_items();
 
+/*let order = document.getElementsByClassName('order');
+for (let i in order) {
+    let statusList = order[i].getElementsByClassName('status').item(0).getElementsByTagName('select').item(0).getElementsByTagName('option');
+    for(let j in statusList){
+        statusList[j].textContent = ''
+    }
+}*/
 
 
 

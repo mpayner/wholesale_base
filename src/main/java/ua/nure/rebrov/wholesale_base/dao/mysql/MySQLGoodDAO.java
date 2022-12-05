@@ -17,7 +17,7 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
     public List<Good> getAll() {
         List <Good> list = new LinkedList<>();
         try {
-            PreparedStatement ps = con.prepareStatement("select g.id, g.user_id, g.manufacturer_id, g.name, g.description, g.price, g.quantity, g.category_id,c.name category_name, c.parent_id, g.unit_type_id from good g join category c on g.category_id = c.id;");
+            PreparedStatement ps = con.prepareStatement("select g.id, g.user_id, g.manufacturer_id, g.name, g.description, g.price, g.quantity, g.category_id,c.name category_name, c.parent_id, g.unit_type_id from good g join category c on g.category_id = c.id");
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 Good good = new Good();
@@ -62,15 +62,34 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
 
     @Override
     public Good getById(String id) {
-        List<Good> allGood = getAll();
-        Good target = null;
-        for(Good good : allGood){
-            if(good.getId().equals(id)){
-                target = good;
-                break;
-            }
+        Good good = null;
+        try {
+            PreparedStatement ps = con.prepareStatement("select g.id, g.user_id, g.manufacturer_id, g.name, g.description, g.price, g.quantity, g.category_id,c.name category_name, c.parent_id, g.unit_type_id from good g join category c on g.category_id = c.id where g.id =?");
+            ps.setInt(1, Integer.valueOf(id));
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            good = new Good();
+            good.setId(rs.getString("id"));
+            MySQLUserDAO user = new MySQLUserDAO();
+            good.setUser(user.getById(rs.getString("user_id")));
+            good.setManufacturer(user.getById(rs.getString("manufacturer_id")));
+            good.setName(rs.getString("name"));
+            good.setDescription(rs.getString("description"));
+            good.setPrice(rs.getDouble("price"));
+            good.setQuantity(rs.getInt("quantity"));
+            good.setCategory(new GoodCategory(
+                    rs.getInt("category_id"),
+                    rs.getString("category_name"),
+                    rs.getInt("parent_id")
+            ));
+            String unit = rs.getInt("unit_type_id") == 1 ? UnitType.Box.toString() : UnitType.Pack.toString();
+            good.setUnitType(unit);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return target;
+
+        return good;
     }
 
     @Override
@@ -181,8 +200,16 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
             }
             ps.setInt(8, Integer.valueOf(good.getManufacturer().getId()));
             ps.executeUpdate();
+            ps.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void add(List<Good> good) {
+        for(Good g:good){
+            add(g);
         }
     }
 

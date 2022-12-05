@@ -22,27 +22,58 @@
 </head>
 <body>
 <th:block th:include="/menu"></th:block>
-<section style="padding: 50px;">
-    <form >
-        <input type="checkbox" id="type">
+<section style="padding: 50px;display: flex;flex-direction: column;align-items: center;">
+    <form  th:if="${#authorization.expression('hasAuthority(''Admin'')') && curUrl!='/orders'}" class="adminMenu">
+        <input type="radio" id="type1" name="type" value="sales"  onclick='this.form.submit()'/>
+        <label for="type1">Продажі</label>
+        <input type="radio" id="type2" name="type" value="orders" onclick='this.form.submit()'/>
+        <label for="type2">Замовлення</label>
     </form>
-    
-    <div th:each="order : ${Orders}">
-        <div class="good">
+    <form method="get">
+        <input type="text" name="customer" id="name1" placeholder="Ім'я замовника товару"/>
+        <input type="text" name="distributor" id="name2" placeholder="Ім'я продавця"/>
+        <input type="submit" value="Пошук"/>
+    </form>
+    <section class="items">
+        <div class="order" th:each="item,map : ${Orders}" th:with="order=${item.key}">
             <p th:utext="${order.status}" style="padding-bottom:5px;border-bottom: dashed 2px"></p>
+            <form method="post" th:action="@{/updateStatus}" class="status" th:if="${order.status.getTitle()!='Виконано' && order.status.getTitle()!='Скасовано'}">
+                <input type="text" name="id" id="id" th:value="${order.id}" hidden>
+                <select name="status" id="status">
+                    <option disabled selected hidden>Змінити статус</option>
+                    <option th:each="s : ${item.value}" th:value="${s}" th:text="${s}"></option>
+                </select>
+                <input type="submit" value="Змінити"/>
+            </form>
             <p th:utext="${'Замовник: ' + order.customer.name}"></p>
             <p th:utext="${'Продавець: ' + order.distributor.name}"></p>
             <p th:utext="${'Створено: ' + #dates.format(order.createDate, 'dd-MM-yyyy, hh:mm')}"></p>
-            <table>
-                <th>Назва товару</th>
-                <th style="padding-left: 10px">Кількість</th>
-                <tr th:each="good : ${order.cart}">
-                    <td th:utext="${good.key.name}"></td>
-                    <td th:utext="${good.value}" style="padding-left: 10px"></td>
-                </tr>
-            </table>
+            <p th:utext="${'Сума замовлення: ' + order.generalSum() + ' ₴'}"></p>
+
+            <button class="btn btn-primary" type="button" data-toggle="collapse" th:attr="data-target=${'#ord'+order.id}, aria-controls=${'ord'+order.id}" aria-expanded="false">
+                Переглянути товари замовлення
+            </button>
+
+            <div class="collapse" th:id="${'ord'+order.id}">
+                <div class="card card-body">
+                    <table>
+                        <th>ID</th>
+                        <th style="padding-left: 10px">Назва товару</th>
+                        <th style="padding-left: 10px">Кількість</th>
+                        <th style="padding-left: 10px">Ціна за одиницю</th>
+                        <th style="padding-left: 10px">Загальна ціна</th>
+                        <tr th:each="good : ${order.cart}">
+                            <td><a th:href="@{'../id=' + ${good.key.id}}" th:utext="${good.key.id}"/></td>
+                            <td th:utext="${good.key.name}" style="padding-left: 10px"></td>
+                            <td th:utext="${good.value + ' ' + good.key.unitType}" style="padding-left: 10px"></td>
+                            <td th:utext="${(good.key.price) + ' ₴'}" style="padding-left: 10px"></td>
+                            <td th:utext="${(good.key.price) * (good.value) + ' ₴'}" style="padding-left: 10px"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 </section>
 <script type="text/javascript" src="static/js/scripts.js" th:src="@{/js/scripts.js}"></script>
 </body>

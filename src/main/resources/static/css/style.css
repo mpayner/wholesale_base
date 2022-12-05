@@ -2,7 +2,7 @@ body{
     font-size:60px;
 }
 
-.good{
+.good, .order{
     width: 300px;
     float: left;
     margin-right:10px;
@@ -11,6 +11,20 @@ body{
     box-shadow: 2px 2px 2px 1px rgba(0, 0, 255, .2);
     background: #fafafa;
 }
+
+.order {
+    width: 600px;
+}
+
+.items{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: stretch;
+}
+
+
 
 .delete-button, .edit-button{
     text-decoration: none;
@@ -22,6 +36,19 @@ body{
     padding-top: 3px;
     border-radius: 50%;
     position: absolute;
+}
+
+.adminMenu input[type="radio"]{
+    display: none;
+}
+
+.adminMenu label{
+    width: 300px;
+    background: #ff8700;
+    color: #fff;
+    font-size: 25px;
+    text-align: center;
+    padding: 10px;
 }
 
 .good:hover .delete-button, .good:hover .edit-button{

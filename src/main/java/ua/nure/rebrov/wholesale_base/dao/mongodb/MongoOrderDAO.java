@@ -4,6 +4,9 @@ import com.mongodb.Cursor;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -16,15 +19,14 @@ import ua.nure.rebrov.wholesale_base.model.User;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class MongoOrderDAO extends MongoDBschema implements OrderDAO {
 
+    MongoCollection<Document> collection =  con.getCollection("order");
 
     @Override
     public void create(Order order) {
-        MongoCollection collection =  con.getCollection("order");
-        order.setCreateDate(new Timestamp(System.currentTimeMillis()));
-        order.setStatus(OrderStatus.Created.toString());
         collection.insertOne(order.toDocument());
     }
 
@@ -35,11 +37,29 @@ public class MongoOrderDAO extends MongoDBschema implements OrderDAO {
         }
     }
 
+    private List<Order> find(Bson request) {
+        MongoCursor<Document> f = collection.find(request).limit(20).cursor();
+        List<Order> list = new LinkedList<>();
+        while (f.hasNext()){
+            list.add(new Order(f.next()));
+        }
+        return list;
+    }
 
+    @Override
+    public List<Order> findByCusAndDis(User customer, User distributor) {
 
-    private List<Order> find(Document request) {
-        MongoCollection<Document> collection =  con.getCollection("order");
-        MongoCursor<Document> f = collection.find(request).cursor();
+        Bson bFilter = Filters.and(
+                Filters.regex("customer.name", ".*"+customer.getName()+".*", "i"),
+                Filters.regex("distributor.name", ".*"+distributor.getName()+".*", "i")
+        );
+        System.out.println(bFilter);
+        return find(bFilter);
+    }
+
+    @Override
+    public List<Order> findAll() {
+        MongoCursor<Document> f = collection.find().cursor();
         List<Order> list = new LinkedList<>();
         while (f.hasNext()){
             list.add(new Order(f.next()));
@@ -49,23 +69,42 @@ public class MongoOrderDAO extends MongoDBschema implements OrderDAO {
 
     @Override
     public List<Order> findByDistributor(User distributor) {
-        return find(new Document("distributor", distributor));
+        Bson bFilter = Filters.or(
+                Filters.eq("customer.id",distributor.getId()),
+                Filters.regex("distributor.name", ".*"+distributor.getName()+".*", "i")
+        );
+        return find(bFilter);
     }
 
     @Override
     public List<Order> findByCustomer(User customer) {
-        return find(new Document("customer", customer));
+        Bson bFilter = Filters.or(
+                Filters.eq("customer.id",customer.getId()),
+                Filters.regex("customer.name", ".*"+customer.getName()+".*", "i")
+        );
+        return find(bFilter);
+    }
+
+    @Override
+    public List<Order> findAll(int q) {
+        MongoCursor<Document> f = collection.find().limit(q).cursor();
+        List<Order> list = new LinkedList<>();
+        while (f.hasNext()){
+            list.add(new Order(f.next()));
+        }
+        return list;
     }
 
     @Override
     public boolean updateStatus(Order order, String status) {
-        MongoCollection collection = con.getCollection("order");
-        UpdateResult result = collection.updateOne(new Document("_id", new ObjectId(order.getId())), new Document("status", status));
+        Bson updates = Updates.set("status", status);
+        UpdateResult result = collection.updateOne(new Document("_id", new ObjectId(order.getId())), updates);
         return result.getModifiedCount()>0;
     }
 
     @Override
     public boolean delete(Order order) {
-        return false;
+        DeleteResult result = collection.deleteOne(new Document("id", new ObjectId(order.getId())));
+        return result.getDeletedCount()>0;
     }
 }

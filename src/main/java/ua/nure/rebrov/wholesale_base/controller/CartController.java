@@ -14,8 +14,8 @@ import ua.nure.rebrov.wholesale_base.security.SecurityService;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-import java.util.TreeMap;
+import javax.servlet.http.HttpSession;
+import java.util.*;
 
 @Controller
 public class CartController {
@@ -25,20 +25,22 @@ public class CartController {
     int cart_items = 0;
 
     @GetMapping("/addToCart")
-    public String addCartItem(Model model, HttpServletResponse response,HttpServletRequest request, @Param("id") String id, @Param("quantity") String quantity) {
+    public String addCartItem(Model model, HttpServletResponse response,HttpServletRequest request, @Param("id") String id, @Param("quantity") Integer quantity) {
         if(id!=null && quantity!=null){
             daoFactory = new MySQLDAO();
             Good g = new Good();
             g.setId(id);
-            if(daoFactory.createGoodDAO().decreaseQuantity(g, Integer.valueOf(quantity))){
-                response.addCookie(new Cookie(id, quantity));
+            if(daoFactory.createGoodDAO().decreaseQuantity(g, quantity)){
+               /* response.addCookie(new Cookie(id, quantity));
                 Cookie[] cookies = request.getCookies();
                 for(Cookie c : cookies){
                     if(!c.getName().equals(id)){
                         response.addCookie(new Cookie("cart_items",String.valueOf(++cart_items)));
                         break;
                     }
-                }
+                }*/
+                response.addCookie(new Cookie("cart_items",String.valueOf(++cart_items)));
+                SecurityService.addToCart(request,id, quantity);
             }else {
                 return "redirect:/403.html";
             }
@@ -48,43 +50,29 @@ public class CartController {
     }
 
     @GetMapping("/increaseQuantity")
-    public String increaseQuantity(Model model, HttpServletRequest request,HttpServletResponse response, @Param("id") String id, @Param("quantity") String quantity) {
+    public String increaseQuantity(Model model, HttpServletRequest request,HttpServletResponse response, @Param("id") String id, @Param("quantity") Integer quantity) {
         daoFactory = new MySQLDAO();
         if(id!=null && quantity!=null){
             Good good = new Good();
             good.setId(id);
-                Cookie[] cookies = request.getCookies();
-                for(Cookie c : cookies){
-                    if(c.getName().equals(id)){
-                        c.setMaxAge(0);
-                        daoFactory.createGoodDAO().increaseQuantity(good, Integer.valueOf(c.getValue())-Integer.valueOf(quantity));
-                        response.addCookie(new Cookie(id, quantity));
-                        break;
-                    }
-                }
-
+            Integer oldValue = SecurityService.editCart(request,id, quantity);
+            daoFactory.createGoodDAO().increaseQuantity(good, oldValue-quantity);
 
         }
         return "redirect.html";
     }
 
     @GetMapping("/decreaseQuantity")
-    public String decreaseQuantity(Model model, HttpServletRequest request,HttpServletResponse response, @Param("id") String id, @Param("quantity") String quantity) {
+    public String decreaseQuantity(Model model, HttpServletRequest request,HttpServletResponse response, @Param("id") String id, @Param("quantity") Integer quantity) {
         daoFactory = new MySQLDAO();
         if(id!=null && quantity!=null){
             Good good = new Good();
             good.setId(id);
-            Cookie[] cookies = request.getCookies();
-            for(Cookie c : cookies){
-                if(c.getName().equals(id)){
-                    c.setMaxAge(0);
-                    daoFactory.createGoodDAO().decreaseQuantity(good, Integer.valueOf(quantity)-Integer.valueOf(c.getValue()));
-                    response.addCookie(new Cookie(id, quantity));
-                    break;
-                }
-            }
+            Integer oldValue = SecurityService.editCart(request,id, quantity);
+            daoFactory.createGoodDAO().decreaseQuantity(good, quantity-oldValue);
+
         }
-        //sdf
+
         return "redirect.html";
     }
 
@@ -93,12 +81,16 @@ public class CartController {
         Map<Good, Integer> goods = new TreeMap<>();
         Cookie[] cookies = request.getCookies();
         daoFactory = new MySQLDAO();
-        for(Cookie c : cookies){
-            Good good = daoFactory.createGoodDAO().getById(c.getName());
-            if(good!=null){
-                goods.put(good,Integer.valueOf(c.getValue()));
+        Map<String, Integer> cart = SecurityService.getCart(request);
+        if(cart!=null){
+            for(Map.Entry entry : cart.entrySet()){
+                Good good = daoFactory.createGoodDAO().getById((String)entry.getKey());
+                if(good!=null){
+                    goods.put(good,(Integer) entry.getValue());
+                }
             }
         }
+
         model.addAttribute("cartItems", cart_items);
         model.addAttribute("cart", goods);
         return "cart.html";
@@ -106,21 +98,12 @@ public class CartController {
 
     @GetMapping("/deleteCartItem={id}")
     public String delete(@PathVariable String id, Model model, HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        Cookie target = null;
-        for(Cookie c : cookies){
-            if(c.getName().equals(id)){
-                target = c;
-                break;
-            }
-        }
         daoFactory = new MySQLDAO();
         Good good = new Good();
-        good.setId(target.getName());
-        if(daoFactory.createGoodDAO().increaseQuantity(good,Integer.valueOf(target.getValue()))) {
-            target.setMaxAge(0);
+        good.setId(id);
+        Integer oldValue = SecurityService.removeFromCart(request, id);
+        if(daoFactory.createGoodDAO().increaseQuantity(good,oldValue)) {
             response.addCookie(new Cookie("cart_items", String.valueOf(--cart_items)));
-            response.addCookie(target);
             return "redirect:/cart";
         }else {
             return "redirect.html";
@@ -130,21 +113,22 @@ public class CartController {
 
     @GetMapping("/cart/createBaseOrder")
     public String saveOrder(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        Map<Good,Integer> cart = new TreeMap<>();
+        Map<Good, Integer> goods = new TreeMap<>();
         daoFactory = new MySQLDAO();
-        for(Cookie c : cookies){
-            Good good = daoFactory.createGoodDAO().getById(c.getName());
-            if(good!=null){
-                cart.put(good,Integer.valueOf(c.getValue()));
-                Cookie delete = new Cookie(c.getName(),c.getValue());
-                delete.setMaxAge(0);
-                response.addCookie(delete);
+        Map<String, Integer> cart = SecurityService.getCart(request);
+        if(cart!=null){
+            for(Map.Entry entry : cart.entrySet()){
+                Good good = daoFactory.createGoodDAO().getById((String)entry.getKey());
+                if(good!=null){
+                    goods.put(good,(Integer) entry.getValue());
+                }
             }
         }
-        cart_items=0;
-        response.addCookie(new Cookie("cart_items", "0"));
-        daoFactory.createOrderDAO().create(Order.groupOrders(cart,SecurityService.getAuthorized()));
+        cart.clear();
+        Cookie c = new Cookie("cart_items", String.valueOf(0));
+        c.setPath("/");
+        response.addCookie(c);
+        daoFactory.createOrderDAO().create(Order.groupOrders(goods,SecurityService.getAuthorized()));
         return "redirect:/";
     }
 

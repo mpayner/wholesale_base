@@ -24,6 +24,8 @@ public interface GoodDAO {
 
     public boolean deleteById(String id);
     public void add(Good good);
+    public void add(List<Good> good);
+
 
     public void update(Good good);
 }

@@ -1,8 +1,11 @@
 package ua.nure.rebrov.wholesale_base.model;
 
+import com.github.javafaker.Faker;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -120,4 +123,56 @@ public class User implements Comparable{
     public int hashCode() {
         return Objects.hash(id, name, phone, email, password, address, base, type, specialization);
     }
+
+    public static User admin() {
+        return new User(
+                "3",
+                "Валентин Симонов",
+                "+380958733276",
+                "qwert@gmail.com",
+                "$2a$10$mc9F.6kMA/aUxN08mFlBcuLUCwjiM1QhSN5afdS7r0MnilyBp9k.2",
+                null,
+                new Base(1, "Оптова База №1","Київська область, Київ"),
+                UserType.Admin.name(),
+                null
+        );
+    }
+
+    public static User client() {
+        return new User(
+                "1",
+                "Ганна Петрівна Щур",
+                "+380501237865",
+                "sdaf@gmail.com",
+                "$2a$10$ii3jGOjKRTR0sM.L3ZmrJubUDGCR32fqzaazIxS3FfQkoJ6a10n7S",
+                "Київська область, Київ",
+                null,
+                UserType.Client.name(),
+                null
+        );
+    }
+
+    public static User distributor() {
+        return new User(
+                "4",
+                "Рошен",
+                "+380958733123",
+                "123@gmail.com",
+                "$2a$10$5ExFuE.9W4iW4uOIF2Zs4enwt/YWC2dmWGsoHg9sItaDglpxXuLOK",
+                "Київська область, Київ, вул Шевченка 12",
+                null,
+                UserType.Distributor.name(),
+                Arrays.asList(new GoodCategory(5,"Солодощі", null),new GoodCategory(7,"Солодка випічка", 4))
+        );
+    }
+
+
+
+
+    public User random(){
+        User user = new User();
+        return user;
+    }
+
+
 }

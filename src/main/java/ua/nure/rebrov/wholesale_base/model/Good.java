@@ -1,9 +1,17 @@
 package ua.nure.rebrov.wholesale_base.model;
 
 
+import com.github.javafaker.Commerce;
+import com.github.javafaker.Faker;
+import org.bson.Document;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-public class Good implements Comparable{
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+
+public class Good implements BsonUtils,Comparable{
     private String id;
     @BsonIgnore
     private User user;
@@ -110,5 +118,47 @@ public class Good implements Comparable{
     @Override
     public int compareTo(Object o) {
         return id.compareTo(((Good)o).id);
+    }
+
+    @Override
+    public Document toDocument() {
+        Document doc = new Document()
+                .append("id", id)
+                .append("name", name)
+                .append("manufacturer", new Document("id", manufacturer.getId()).append("name", manufacturer.getName()))
+                .append("price", price)
+                .append("category", new Document("id", category.getIdCategory()).append("name", category.getName()))
+                .append("unitType", unitType);
+        return doc;
+    }
+
+    public static Good random(){
+        Faker faker = new Faker(new Locale("uk-UA"));
+        Good g = new Good();
+        Random rnd = new Random();
+        g.setId(String.valueOf(rnd.nextInt()));
+        if(rnd.nextBoolean()){
+            g.setUser(User.distributor());
+            g.setQuantity(null);
+        }else{
+            g.setUser(User.admin());
+            g.setQuantity(rnd.nextInt(100)+1);
+        }
+        g.setManufacturer(User.distributor());
+        Commerce c = faker.commerce();
+        g.setName(c.productName());
+        g.setDescription(faker.bothify("?????#???#?"));
+        g.setPrice(rnd.nextDouble(400)+30);
+        g.setCategory(new GoodCategory(5,"Солодощі", null));
+        g.setUnitType(UnitType.Box.toString());
+        return g;
+    }
+
+    public static List<Good> randomList(int i){
+        List<Good> randomList = new LinkedList<>();
+        for (int j=0; j<i;j++){
+            randomList.add(random());
+        }
+        return randomList;
     }
 }

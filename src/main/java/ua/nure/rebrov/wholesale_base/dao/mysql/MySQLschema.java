@@ -9,10 +9,6 @@ public class MySQLschema {
     protected Connection con;
 
     public MySQLschema(){
-        try {
-            con = MySQLConnector.getDefaultConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        con = MySQLConnector.getDefaultConnection();
     }
 }

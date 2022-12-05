@@ -10,16 +10,30 @@ public class MySQLConnector {
     private static String dbUrl =
             "jdbc:mysql://localhost/wholesale_base";
     private static Connection con = null;
-    public static Connection getDefaultConnection() throws
-            SQLException {
+    public static Connection getDefaultConnection(){
         if (con == null)
         {
+            try {
             Properties connInfo = new Properties();
             connInfo.put("user", dbUser);
             connInfo.put("password", dbPassword);
             connInfo.put("useUnicode", "true");
             connInfo.put("characterEncoding", "utf-8");
-            return DriverManager.getConnection(dbUrl, connInfo);}
+            return DriverManager.getConnection(dbUrl, connInfo);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return con;
+    }
+
+    public static void closeConnection(){
+        if(con!=null){
+            try {
+                con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

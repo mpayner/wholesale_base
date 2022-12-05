@@ -8,8 +8,7 @@ public class Base {
     private String name;
     private String address;
 
-    @BsonCreator
-    public Base(@BsonProperty("id") Integer id, @BsonProperty("name") String name,@BsonProperty("address") String address) {
+    public Base(Integer id,String name,String address) {
         this.id = id;
         this.name = name;
         this.address = address;

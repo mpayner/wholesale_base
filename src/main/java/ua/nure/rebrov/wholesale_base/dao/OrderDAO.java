@@ -10,9 +10,13 @@ import java.util.Map;
 public interface OrderDAO {
     void create(Order order);
     void create(List<Order> orderList);
-
+    List<Order> findAll();
     List<Order> findByDistributor(User distributor);
     List<Order> findByCustomer(User customer);
+
+    List<Order> findAll(int q);
+
+    List<Order> findByCusAndDis(User customer, User distributor);
 
     boolean updateStatus(Order order, String status);
 

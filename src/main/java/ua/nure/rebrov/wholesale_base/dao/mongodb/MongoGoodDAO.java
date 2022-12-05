@@ -33,6 +33,11 @@ public class MongoGoodDAO extends MongoDBschema implements GoodDAO {
     }
 
     @Override
+    public void add(List<Good> good) {
+
+    }
+
+    @Override
     public List<Good> getPriceList(User distributor) {
         return null;
     }
