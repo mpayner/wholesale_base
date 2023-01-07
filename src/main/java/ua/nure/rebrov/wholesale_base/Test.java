@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import ua.nure.rebrov.wholesale_base.dao.DAOFactory;
 import ua.nure.rebrov.wholesale_base.dao.GoodDAO;
 import ua.nure.rebrov.wholesale_base.dao.MySQLDAO;
+import ua.nure.rebrov.wholesale_base.dao.OrderDAO;
 import ua.nure.rebrov.wholesale_base.dao.mysql.MySQLGoodDAO;
+import ua.nure.rebrov.wholesale_base.dao.mysql.MySQLOrderDAO;
 import ua.nure.rebrov.wholesale_base.dao.mysql.ProxyMySQLGoodDAO;
 import ua.nure.rebrov.wholesale_base.model.*;
 import ua.nure.rebrov.wholesale_base.patterns.GoodHistory;
@@ -23,13 +25,17 @@ public class Test {
         rootLogger.setLevel(Level.OFF);*/
 
         // Тестування різних типів DAO
-        /*DAOTest daoTest = new DAOTest(new MongoDBDAO());
+        /*
+        System.out.print("=======================ABSTRACT_FACTORY & SINGLETON=======================\n\n");
+        DAOTest daoTest = new DAOTest(new MongoDBDAO());
         daoTest.test();
         daoTest.setDAO(new MySQLDAO());
         daoTest.test();*/
 
         // Builder
-        /*Order o = new Order.Builder(User.client(), User.admin())
+        /*
+        System.out.print("\n\n=======================BUILDER=======================\n\n");
+        Order o = new Order.Builder(User.client(), User.admin())
                 .setStatus(OrderStatus.Created)
                 .setAddress("Київ")
                 .setId("3")
@@ -37,52 +43,58 @@ public class Test {
                 .addCartItem(Good.random(), 4)
                 .addCartItem(Good.random(), 2)
                 .build();
-        System.out.println(o);*/
-        // Builder-END
+        System.out.println(o);
+        */
 
 
         // Observer
-        /*GoodDAO dao = new MySQLDAO().createGoodDAO();
+        /*
+        System.out.print("\n\n=======================OBSERVER=======================\n\n");
+        GoodDAO dao = new MySQLDAO().createGoodDAO();
         dao.add(Good.random());
         dao.add(Good.random());
         Good good = dao.getById("44");
         good.setName("Смаколик");
         good.setPrice(3000.0);
-        dao.update(good);*/
-        // Observer-END
+        dao.update(good);
+        */
 
         // MEMENTO
+        /*
+        System.out.print("\n\n=======================MEMENTO=======================\n\n");
         Good good = new MySQLGoodDAO().getById("25");
         GoodHistory history = new GoodHistory(good.getId());
+        System.out.println("[Товар до змінення]");
         System.out.println(good.toDocument().toJson());
         history.save(good);
         good.setName("ОООРЦЙ");
         good.setPrice(4323.0);
         history.save(good);
+        System.out.println("[Товар після змінення та збереження]");
         System.out.println(good.toDocument().toJson());
         good.setName("2222");
         history.save(good);
+        System.out.println("[Товар після змінення та збереження]");
         System.out.println(good.toDocument().toJson());
-        System.out.println(history.getUndo());
-        history.undo();
-        System.out.println(history.undo().toDocument().toJson());
         good.restore(history.undo());
-        good.restore(history.undo());
-        good.restore(history.undo());
-
-        System.out.println(history.getUndo());
+        System.out.println("[Дані товару з останньої збереженої версії]");
         System.out.println(good.toDocument().toJson());
-
-        // MEMENTO-END
+        good.restore(history.undo());
+        System.out.println("[Дані товару з останньої збереженої версії]");
+        System.out.println(good.toDocument().toJson());
+        good.restore(history.undo());
+        System.out.println("[Дані товару з останньої збереженої версії]");
+        System.out.println(good.toDocument().toJson());
+        */
 
         // Proxy
-        /*CurUser.login(User.admin());
+        System.out.print("\n\n=======================PROXY=======================\n\n");
+        CurUser.login(User.admin());
         GoodDAO dao = new ProxyMySQLGoodDAO();
         ProxyTest proxy = new ProxyTest();
         proxy.test(dao);
         CurUser.logout();
         CurUser.login(User.client());
-        proxy.test(dao);*/
-        // Proxy-END
+        proxy.test(dao);
     }
 }

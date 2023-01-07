@@ -1,1 +1,0 @@
-{"name": "sdfdsf", "price": 500.0, "cpu": {}, "gpu": [], "ram": {}, "rom": [], "screen": {}}
