@@ -8,6 +8,7 @@ public interface UserDAO {
     public List<User> getAll();
 
     public List<User> getDistributors();
+    public List<User> getAdmins();
     public void save(User user);
     public User getById(String id);
 

@@ -21,4 +21,6 @@ public interface OrderDAO {
     boolean updateStatus(Order order, String status);
 
     boolean delete(Order order);
+
+    void migrate(Integer q);
 }

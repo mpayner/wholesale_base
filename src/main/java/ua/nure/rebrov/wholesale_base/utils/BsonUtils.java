@@ -1,4 +1,4 @@
-package ua.nure.rebrov.wholesale_base.model;
+package ua.nure.rebrov.wholesale_base.utils;
 
 import org.bson.Document;
 

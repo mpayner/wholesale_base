@@ -23,7 +23,7 @@ public class MongoDBConnector {
     private static final String dbUser = "root";
     private static final String dbPassword = "1234";
     private static final String dbName = "wholesale_base";
-    private static String dbUrl = "mongodb://localhost:27017/";
+    private static String dbUrl = "mongodb://localhost:27017";
     private static MongoDatabase con = null;
 
     public static MongoDatabase getDefaultConnection() {

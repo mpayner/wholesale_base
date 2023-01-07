@@ -1,18 +1,17 @@
 package ua.nure.rebrov.wholesale_base.model;
 
-import com.google.gson.Gson;
+import ognl.IntHashMap;
 import org.bson.*;
-import org.bson.codecs.pojo.annotations.BsonExtraElements;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.codecs.pojo.annotations.BsonRepresentation;
 import org.bson.types.ObjectId;
+import ua.nure.rebrov.wholesale_base.utils.BsonUtils;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-public class Order implements BsonUtils{
+public class Order implements BsonUtils {
     @BsonIgnore
     private String id;
     private User customer;
@@ -40,9 +39,6 @@ public class Order implements BsonUtils{
         this.cart = builder.cart;
     }
 
-
-
-
     public static class Builder{
         private String id;
         private User customer;
@@ -52,12 +48,23 @@ public class Order implements BsonUtils{
         private OrderStatus status;
         private String address;
         private Timestamp deliveryDate;
-        final private Map<Good, Integer> cart;
+        private Map<Good, Integer> cart;
+
+        public Builder(User customer, User distributor_id) {
+            this.customer = customer;
+            this.distributor = distributor_id;
+            this.cart = new LinkedHashMap<>();
+        }
 
         public Builder(User customer, User distributor_id, Map<Good, Integer> cart) {
             this.customer = customer;
             this.distributor = distributor_id;
             this.cart = cart;
+        }
+
+        public Builder addCartItem(Good good, Integer quantity){
+            this.cart.put(good, quantity);
+            return this;
         }
 
         public Builder setId(String id){
@@ -244,9 +251,7 @@ public class Order implements BsonUtils{
                 .append("createDate", createDate)
                 .append("deliveryDate", deliveryDate)
                 .append("waybill", waybill);
-        if(customer.getType().equals(UserType.Admin.toString())){
-            doc.append("address", customer.getBase().getAddress());
-        }else if(customer.getType().equals(UserType.Client.toString()) && customer.getAddress()!=null){
+        if(customer.getType().equals(UserType.Client.toString()) && customer.getAddress()!=null){
             doc.append("address", customer.getAddress());
         }else {
             doc.append("address", address);
@@ -299,5 +304,13 @@ public class Order implements BsonUtils{
         return sum;
     }
 
-
+    @Override
+    public String toString() {
+        String str = "Замовник:" + customer.getName() +"\nПродавець:" + distributor.getName() + "\nДата замовлення:" + createDate+"\nТовари:\n";
+        for (Map.Entry entry : this.cart.entrySet()) {
+            Good o = (Good)entry.getKey();
+            str+=o.getName() + " = " + entry.getValue() + "\n";
+        }
+        return str+"\n==================================";
+    }
 }

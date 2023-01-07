@@ -5,19 +5,29 @@ import ua.nure.rebrov.wholesale_base.model.Good;
 import ua.nure.rebrov.wholesale_base.model.GoodCategory;
 import ua.nure.rebrov.wholesale_base.model.UnitType;
 import ua.nure.rebrov.wholesale_base.model.User;
+import ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver;
+import ua.nure.rebrov.wholesale_base.patterns.Observed;
+import ua.nure.rebrov.wholesale_base.patterns.Observer;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
+public class MySQLGoodDAO extends MySQLschema implements GoodDAO, Observed<Good> {
+
+    List<Observer> subscribers;
+    public MySQLGoodDAO(){
+        super();
+        subscribers = Arrays.asList(new ConsoleLogObserver());
+    }
 
 
     @Override
     public List<Good> getAll() {
         List <Good> list = new LinkedList<>();
         try {
-            PreparedStatement ps = con.prepareStatement("select g.id, g.user_id, g.manufacturer_id, g.name, g.description, g.price, g.quantity, g.category_id,c.name category_name, c.parent_id, g.unit_type_id from good g join category c on g.category_id = c.id");
+            PreparedStatement ps = con.prepareStatement("select g.id, g.user_id, g.manufacturer_id, g.name, g.description, g.price, g.quantity, g.category_id,c.name category_name, c.parent_id, g.unit_type_id from good g join category c on g.category_id = c.id limit 300");
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 Good good = new Good();
@@ -68,23 +78,24 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
             ps.setInt(1, Integer.valueOf(id));
             ResultSet rs = ps.executeQuery();
             rs.next();
-            good = new Good();
-            good.setId(rs.getString("id"));
-            MySQLUserDAO user = new MySQLUserDAO();
-            good.setUser(user.getById(rs.getString("user_id")));
-            good.setManufacturer(user.getById(rs.getString("manufacturer_id")));
-            good.setName(rs.getString("name"));
-            good.setDescription(rs.getString("description"));
-            good.setPrice(rs.getDouble("price"));
-            good.setQuantity(rs.getInt("quantity"));
-            good.setCategory(new GoodCategory(
-                    rs.getInt("category_id"),
-                    rs.getString("category_name"),
-                    rs.getInt("parent_id")
-            ));
-            String unit = rs.getInt("unit_type_id") == 1 ? UnitType.Box.toString() : UnitType.Pack.toString();
-            good.setUnitType(unit);
-
+            if(!rs.wasNull()) {
+                good = new Good();
+                good.setId(rs.getString("id"));
+                MySQLUserDAO user = new MySQLUserDAO();
+                good.setUser(user.getById(rs.getString("user_id")));
+                good.setManufacturer(user.getById(rs.getString("manufacturer_id")));
+                good.setName(rs.getString("name"));
+                good.setDescription(rs.getString("description"));
+                good.setPrice(rs.getDouble("price"));
+                good.setQuantity(rs.getInt("quantity"));
+                good.setCategory(new GoodCategory(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name"),
+                        rs.getInt("parent_id")
+                ));
+                String unit = rs.getInt("unit_type_id") == 1 ? UnitType.Box.toString() : UnitType.Pack.toString();
+                good.setUnitType(unit);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -179,7 +190,7 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
            return false;
         }
     }
-        @Override
+    @Override
     public void add(Good good) {
         try {
             PreparedStatement ps = con.prepareStatement("insert into good(user_id, name, description, price, quantity, category_id, unit_type_id, manufacturer_id) values (?,?,?,?,?,?,?,?)");
@@ -201,6 +212,9 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
             ps.setInt(8, Integer.valueOf(good.getManufacturer().getId()));
             ps.executeUpdate();
             ps.close();
+            // NOTIFY
+            notifyObservers(good, "додав");
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -216,12 +230,6 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
     @Override
     public void update(Good good) {
         try {
-            /*String cat_id = good.getId().substring(good.getId().indexOf(",")+1);
-            String id = good.getId().substring(0, good.getId().indexOf(","));
-            good.getCategory().setIdCategory(Integer.valueOf(cat_id));
-            good.setId(id);*/
-            System.out.println("sas:" + good.getId() + "|" + good.getCategory().getIdCategory());
-
             PreparedStatement ps = con.prepareStatement("UPDATE good SET `name`=?,description=?,price=?,quantity=?,category_id=?,unit_type_id=? where id=?;");
             ps.setString(1, good.getName());
             ps.setString(2, good.getDescription());
@@ -238,11 +246,44 @@ public class MySQLGoodDAO extends MySQLschema implements GoodDAO {
                 ps.setInt(6, UnitType.Pack.ordinal()+1);
             }
             ps.setInt(7, Integer.valueOf(good.getId()));
-            System.out.println(good.getId());
-            System.out.println(ps.toString());
             ps.executeUpdate();
+            notifyObservers(good, "змінив");
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+
+    }
+
+    @Override
+    public void notifyObservers(Good good, String action) {
+        User user = good.getUser();
+        String message = user.getType() +" "+ user.getName()
+                + " " +action+" товар:"+
+        "#"+good.getId()+" = "+good.getName()+"; ";
+        for(Observer observer : subscribers){
+            observer.notify(message);
+        }
+    }
+
+    @Override
+    public void notifyObservers(List<Good> good, String action) {
+        User user = good.get(0).getUser();
+        String message = user.getType() + user.getName()
+                + " " +action+" такі товари:";
+        for(Good g : good){
+            message +="#"+g.getId()+" = "+g.getName()+"; ";
+        }
+        for(Observer observer : subscribers){
+            observer.notify(message);
         }
     }
 }

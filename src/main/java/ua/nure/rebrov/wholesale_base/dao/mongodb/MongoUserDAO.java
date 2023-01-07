@@ -17,6 +17,11 @@ public class MongoUserDAO extends MongoDBschema implements UserDAO {
     }
 
     @Override
+    public List<User> getAdmins() {
+        return null;
+    }
+
+    @Override
     public void save(User user) {
 
     }

@@ -6,10 +6,9 @@ import com.github.javafaker.Faker;
 import org.bson.Document;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
+
+import ua.nure.rebrov.wholesale_base.utils.BsonUtils;
 
 public class Good implements BsonUtils,Comparable{
     private String id;
@@ -41,7 +40,29 @@ public class Good implements BsonUtils,Comparable{
         this.unitType = unitType;
     }
 
+    public Good(Good save){
+        this.id = save.getId();
+        this.user = save.getUser();
+        this.manufacturer = save.getManufacturer();
+        this.name = save.getName();
+        this.description = save.getDescription();
+        this.price = save.getPrice();
+        this.quantity = save.getQuantity();
+        this.category = save.getCategory();
+        this.unitType = save.getUnitType();
+    }
 
+    public void restore(Good save){
+        this.id = save.getId();
+        this.user = save.getUser();
+        this.manufacturer = save.getManufacturer();
+        this.name = save.getName();
+        this.description = save.getDescription();
+        this.price = save.getPrice();
+        this.quantity = save.getQuantity();
+        this.category = save.getCategory();
+        this.unitType = save.getUnitType();
+    }
 
     public String getId() {
         return id;
@@ -160,5 +181,18 @@ public class Good implements BsonUtils,Comparable{
             randomList.add(random());
         }
         return randomList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Good good = (Good) o;
+        return Objects.equals(id, good.id) && Objects.equals(user, good.user) && Objects.equals(manufacturer, good.manufacturer) && Objects.equals(name, good.name) && Objects.equals(description, good.description) && Objects.equals(price, good.price) && Objects.equals(quantity, good.quantity) && Objects.equals(category, good.category) && Objects.equals(unitType, good.unitType);
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
     }
 }

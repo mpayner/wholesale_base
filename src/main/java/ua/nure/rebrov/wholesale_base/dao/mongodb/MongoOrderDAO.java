@@ -1,6 +1,7 @@
 package ua.nure.rebrov.wholesale_base.dao.mongodb;
 
 import com.mongodb.Cursor;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -12,6 +13,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import ua.nure.rebrov.wholesale_base.dao.OrderDAO;
+import ua.nure.rebrov.wholesale_base.dao.mysql.MySQLOrderDAO;
 import ua.nure.rebrov.wholesale_base.model.Order;
 import ua.nure.rebrov.wholesale_base.model.OrderStatus;
 import ua.nure.rebrov.wholesale_base.model.User;
@@ -32,8 +34,23 @@ public class MongoOrderDAO extends MongoDBschema implements OrderDAO {
 
     @Override
     public void create(List<Order> orderList) {
+        int errors = 0;
         for(Order o : orderList){
-            create(o);
+            try {
+                create(o);
+            } catch(Exception e){
+                e.printStackTrace();
+                if(errors>3){
+                    break;
+                }else{
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                errors++;
+            }
         }
     }
 
@@ -106,5 +123,12 @@ public class MongoOrderDAO extends MongoDBschema implements OrderDAO {
     public boolean delete(Order order) {
         DeleteResult result = collection.deleteOne(new Document("id", new ObjectId(order.getId())));
         return result.getDeletedCount()>0;
+    }
+
+    @Override
+    public void migrate(Integer q) {
+        List<Order> orderList = q==null ? findAll() : findAll(q);
+        MySQLOrderDAO dao = new MySQLOrderDAO();
+        dao.create(orderList);
     }
 }

@@ -1,25 +1,23 @@
 package ua.nure.rebrov.wholesale_base.model;
 
-import com.github.javafaker.Faker;
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class User implements Comparable{
-    private String id;
-    private String name;
-    private String phone;
-    private String email;
+public class User implements Comparable {
+    protected String id;
+    protected String name;
+    protected String phone;
+    protected String email;
     @BsonIgnore
-    private String password;
-    private String address;
-    private Base base;
-    private String type;
-    private List<GoodCategory> specialization;
+    protected String password;
+    protected String address;
+    @BsonIgnore
+    protected Base base;
+    protected String type;
+    protected List<GoodCategory> specialization;
 
     public User(){}
     public User(String id, String name, String phone, String email, String password, String address, Base base, String type, List<GoodCategory> specialization) {
@@ -165,14 +163,5 @@ public class User implements Comparable{
                 Arrays.asList(new GoodCategory(5,"Солодощі", null),new GoodCategory(7,"Солодка випічка", 4))
         );
     }
-
-
-
-
-    public User random(){
-        User user = new User();
-        return user;
-    }
-
 
 }

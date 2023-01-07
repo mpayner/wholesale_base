@@ -19,7 +19,6 @@ public class SessionEventListener extends HttpSessionEventPublisher {
 
     @Override
     public void sessionDestroyed(HttpSessionEvent event) {
-        // БД движения
         super.sessionDestroyed(event);
     }
 
