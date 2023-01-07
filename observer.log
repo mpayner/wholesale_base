@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="windows-1251" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2023-01-06T15:07:18.114083900Z</date>
+  <millis>1673017638114</millis>
+  <nanos>83900</nanos>
+  <sequence>0</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Admin Валентин Симонов додав товар:#-1275705442 = міцний шовковий піджак; </message>
+</record>
+<record>
+  <date>2023-01-06T15:07:18.269986800Z</date>
+  <millis>1673017638269</millis>
+  <nanos>986800</nanos>
+  <sequence>1</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Admin Валентин Симонов додав товар:#185490498 = важкий шовковий радіатор; </message>
+</record>
+<record>
+  <date>2023-01-06T15:07:18.420963200Z</date>
+  <millis>1673017638420</millis>
+  <nanos>963200</nanos>
+  <sequence>2</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Distributor Рошен змінив товар:#44 = Смаколик; </message>
+</record>
+</log>
+<?xml version="1.0" encoding="windows-1251" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2023-01-07T11:50:19.259090400Z</date>
+  <millis>1673092219259</millis>
+  <nanos>90400</nanos>
+  <sequence>0</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Admin Валентин Симонов додав товар:#-735276647 = блискучий шовковий берет; </message>
+</record>
+<record>
+  <date>2023-01-07T11:50:19.310058600Z</date>
+  <millis>1673092219310</millis>
+  <nanos>58600</nanos>
+  <sequence>1</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Admin Валентин Симонов змінив товар:#-735276647 = блискучий шовковий берет; </message>
+</record>
+</log>
+<?xml version="1.0" encoding="windows-1251" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2023-01-07T13:39:46.542502500Z</date>
+  <millis>1673098786542</millis>
+  <nanos>502500</nanos>
+  <sequence>0</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Distributor Рошен змінив товар:#25 = ергономічний бетонний берет; </message>
+</record>
+<record>
+  <date>2023-01-07T13:39:46.627477800Z</date>
+  <millis>1673098786627</millis>
+  <nanos>477800</nanos>
+  <sequence>1</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Distributor Рошен змінив товар:#25 = ОООРЦЙ; </message>
+</record>
+<record>
+  <date>2023-01-07T13:39:46.635506800Z</date>
+  <millis>1673098786635</millis>
+  <nanos>506800</nanos>
+  <sequence>2</sequence>
+  <logger>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</logger>
+  <level>INFO</level>
+  <class>ua.nure.rebrov.wholesale_base.patterns.ConsoleLogObserver</class>
+  <method>notify</method>
+  <thread>1</thread>
+  <message>Distributor Рошен змінив товар:#25 = 2222; </message>
+</record>
+</log>
