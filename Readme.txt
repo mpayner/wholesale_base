@@ -1,6 +1,7 @@
 Клас для виконання Test. Вивід інформації виконання у консолі.
 
-У папці "база даних" зберігається: дамп MySQL та MongoDB, схема MySQL БД
+У папці "база даних" зберігається: дамп MySQL та MongoDB, схема MySQL БД.
+Назва БД: wholesale_base
 
 [ПЗ 1-2]
 Клас DAOTest приймає у конструктор екземпляр OrderDAO(MySQLOrderDAO, MongoOrderDAO)
